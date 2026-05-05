@@ -6,6 +6,7 @@ import (
 	"os/exec"
 	"strings"
 	"time"
+	"unicode/utf8"
 )
 
 type Engine struct {
@@ -21,9 +22,10 @@ type Engine struct {
 }
 
 type Placing struct {
-	ArtWork *ArtWork
-	PosY    int
-	Padding int
+	ArtWork  *ArtWork
+	Snapshot []string
+	PosY     int
+	Padding  int
 }
 
 func (e *Engine) Route(command string, args []string) {
@@ -45,7 +47,7 @@ func (e *Engine) Route(command string, args []string) {
 	}
 	e.ManipulateBuffer(0)
 	fmt.Print(strings.Join(e.FinalBuffer, "\n"))
-	for i := range frame_count {
+	for i := range frame_count * 10 {
 		time.Sleep(50 * time.Millisecond)
 		fmt.Printf("\033[%dA", len(e.FinalBuffer)-1)
 		e.ManipulateBuffer(i)
@@ -95,6 +97,8 @@ func (e *Engine) ManipulateBuffer(frame int) {
 	e.FinalBuffer = []string{}
 	cursor := 0
 
+	e.ManipulateArts3(frame)
+
 	for _, art := range e.Map {
 
 		for cursor < art.PosY {
@@ -103,25 +107,54 @@ func (e *Engine) ManipulateBuffer(frame int) {
 		}
 
 		for cursor < (art.PosY + art.ArtWork.Height) {
-			relativeLine := cursor - art.PosY
-			threshold := art.ArtWork.Height - frame
-			if threshold < 0 {
-				threshold = 0
-			}
-
-			artLine := ""
-			if relativeLine >= threshold {
-				artLine = art.ArtWork.Content[relativeLine-threshold]
-			}
-			line := fmt.Sprintf("%-*s%s", art.Padding, e.Buffer[cursor], artLine)
+			line := fmt.Sprintf("%-*s%s", art.Padding, e.Buffer[cursor], art.Snapshot[cursor-art.PosY])
 			e.FinalBuffer = append(e.FinalBuffer, line)
 			cursor++
 		}
 	}
 
-	// Adiciona o restante do buffer original
 	for cursor < len(e.Buffer) {
 		e.FinalBuffer = append(e.FinalBuffer, e.Buffer[cursor])
 		cursor++
+	}
+}
+
+func (e *Engine) ManipulateArts1(frame int) {
+	for i := range e.Map {
+		e.Map[i].Snapshot = []string{}
+		for art_index, line := range e.Map[i].ArtWork.Content {
+			if art_index >= frame {
+				e.Map[i].Snapshot = append(e.Map[i].Snapshot, strings.Repeat(" ", utf8.RuneCountInString(line)))
+			}
+		}
+		for art_index, line := range e.Map[i].ArtWork.Content {
+			if art_index < frame {
+				e.Map[i].Snapshot = append(e.Map[i].Snapshot, line)
+			}
+		}
+	}
+}
+
+func (e *Engine) ManipulateArts2(frame int) {
+	for i := range e.Map {
+		e.Map[i].Snapshot = []string{}
+		for art_index, line := range e.Map[i].ArtWork.Content {
+			if art_index < frame {
+				e.Map[i].Snapshot = append(e.Map[i].Snapshot, line)
+			} else {
+				e.Map[i].Snapshot = append(e.Map[i].Snapshot, strings.Repeat(" ", utf8.RuneCountInString(line)))
+			}
+		}
+	}
+}
+
+func (e *Engine) ManipulateArts3(frame int) {
+	for i := range e.Map {
+		e.Map[i].Snapshot = []string{}
+		for _, line := range e.Map[i].ArtWork.Content {
+			runes := []rune(line)
+			frame = frame % len(runes)
+			e.Map[i].Snapshot = append(e.Map[i].Snapshot, string(runes[frame:])+string(runes[:frame]))
+		}
 	}
 }
