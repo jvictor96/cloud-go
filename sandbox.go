@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"os"
-	"os/exec"
 
 	"golang.org/x/term"
 )
@@ -13,19 +12,24 @@ func main() {
 	if e != nil {
 		fmt.Println(e)
 	}
+	galery := Galery{
+		Path: fmt.Sprintf("%s/%s", os.Getenv("HOME"), ".cloud/art/"),
+	}
+	galery.LoadArt()
 	engine := Engine{
 		Columns:  w, // Detectar via term.GetSize ou exec "tput cols"
 		Lines:    h,
 		Spacing:  2,
 		MaxLines: 100,
+		Galery:   galery,
 	}
-	fmt.Println(engine.Columns, engine.Lines)
 
+	command := os.Args[1]
 	args := os.Args[2:]
-	cmd := exec.Command(os.Args[1], args...)
-	out, err := cmd.Output()
-	if err != nil {
-		fmt.Println(err)
+
+	if command == "cfg" {
+		galery.Route(args)
+		return
 	}
-	fmt.Println(string(out))
+	engine.Route(command, args)
 }
