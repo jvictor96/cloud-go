@@ -23,8 +23,7 @@ type Engine struct {
 type Placing struct {
 	ArtWork *ArtWork
 	PosY    int
-	MinDif  int
-	Fuzz    int
+	Padding int
 }
 
 func (e *Engine) Route(command string, args []string) {
@@ -47,7 +46,7 @@ func (e *Engine) Route(command string, args []string) {
 	e.ManipulateBuffer(0)
 	fmt.Print(strings.Join(e.FinalBuffer, "\n"))
 	for i := range frame_count {
-		time.Sleep(1000 * time.Millisecond)
+		time.Sleep(50 * time.Millisecond)
 		fmt.Printf("\033[%dA", len(e.FinalBuffer)-1)
 		e.ManipulateBuffer(i)
 		fmt.Print(strings.Join(e.FinalBuffer, "\n"))
@@ -77,8 +76,7 @@ func (e *Engine) PlaceImages() bool {
 					e.Map = append(e.Map, Placing{
 						ArtWork: art,
 						PosY:    pos,
-						MinDif:  minDif,
-						Fuzz:    fuzz,
+						Padding: minDif + fuzz,
 					})
 					modified = true
 					break
@@ -99,13 +97,11 @@ func (e *Engine) ManipulateBuffer(frame int) {
 
 	for _, art := range e.Map {
 
-		// Preenche as linhas antes da imagem
 		for cursor < art.PosY {
 			e.FinalBuffer = append(e.FinalBuffer, e.Buffer[cursor])
 			cursor++
 		}
 
-		// Desenha a imagem com o efeito de frame (scroll-in)
 		for cursor < (art.PosY + art.ArtWork.Height) {
 			relativeLine := cursor - art.PosY
 			threshold := art.ArtWork.Height - frame
@@ -117,10 +113,7 @@ func (e *Engine) ManipulateBuffer(frame int) {
 			if relativeLine >= threshold {
 				artLine = art.ArtWork.Content[relativeLine-threshold]
 			}
-
-			// Montagem da linha: Buffer original + Padding + Arte
-			padding := art.MinDif + art.Fuzz
-			line := fmt.Sprintf("%-*s%s", padding, e.Buffer[cursor], artLine)
+			line := fmt.Sprintf("%-*s%s", art.Padding, e.Buffer[cursor], artLine)
 			e.FinalBuffer = append(e.FinalBuffer, line)
 			cursor++
 		}

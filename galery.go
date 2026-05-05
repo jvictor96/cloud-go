@@ -49,7 +49,7 @@ func (g *Galery) Route(args []string) {
 
 func (g *Galery) AddImage(Path string) {
 	Name := strings.Split(Path, "/")
-	os.Rename(Path, fmt.Sprintf("%s%s", g.Path, Name))
+	os.Rename(Path, fmt.Sprintf("%s%s", g.Path, Name[len(Name)-1]))
 }
 
 func (g *Galery) RemoveImage(Name string) {
