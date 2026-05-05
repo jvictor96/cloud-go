@@ -2,13 +2,11 @@ package main
 
 import (
 	"strings"
-	"time"
 )
 
 type Transformer interface {
 	Transform(frame int, e *Engine)
 	CalculateFrameCount(e *Engine) int
-	Sleep()
 }
 
 type Float struct {
@@ -22,10 +20,6 @@ func (f *Float) CalculateFrameCount(e *Engine) int {
 		}
 	}
 	return frame_count * 2
-}
-
-func (f *Float) Sleep() {
-	time.Sleep(50 * time.Millisecond)
 }
 
 func (f *Float) Transform(frame int, e *Engine) {
