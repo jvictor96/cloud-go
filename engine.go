@@ -5,13 +5,13 @@ import (
 	"math/rand"
 	"os/exec"
 	"strings"
-	"time"
 	"unicode/utf8"
 )
 
 type Engine struct {
 	Buffer      []string
 	Galery      Galery
+	Transformer Transformer
 	Map         []Placing
 	FinalBuffer []string
 	Columns     int
@@ -39,16 +39,11 @@ func (e *Engine) Route(command string, args []string) {
 
 	for e.PlaceImages() {
 	}
-	frame_count := 0
-	for _, art := range e.Map {
-		if art.ArtWork.Height > frame_count {
-			frame_count = art.ArtWork.Height
-		}
-	}
+	frame_count := e.Transformer.CalculateFrameCount(e)
 	e.ManipulateBuffer(0)
 	fmt.Print(strings.Join(e.FinalBuffer, "\n"))
-	for i := range frame_count * 10 {
-		time.Sleep(50 * time.Millisecond)
+	for i := range frame_count {
+		e.Transformer.Sleep()
 		fmt.Printf("\033[%dA", len(e.FinalBuffer)-1)
 		e.ManipulateBuffer(i)
 		fmt.Print(strings.Join(e.FinalBuffer, "\n"))
@@ -97,7 +92,7 @@ func (e *Engine) ManipulateBuffer(frame int) {
 	e.FinalBuffer = []string{}
 	cursor := 0
 
-	e.ManipulateArts3(frame)
+	e.Transformer.Transform(frame, e)
 
 	for _, art := range e.Map {
 
@@ -116,22 +111,6 @@ func (e *Engine) ManipulateBuffer(frame int) {
 	for cursor < len(e.Buffer) {
 		e.FinalBuffer = append(e.FinalBuffer, e.Buffer[cursor])
 		cursor++
-	}
-}
-
-func (e *Engine) ManipulateArts1(frame int) {
-	for i := range e.Map {
-		e.Map[i].Snapshot = []string{}
-		for art_index, line := range e.Map[i].ArtWork.Content {
-			if art_index >= frame {
-				e.Map[i].Snapshot = append(e.Map[i].Snapshot, strings.Repeat(" ", utf8.RuneCountInString(line)))
-			}
-		}
-		for art_index, line := range e.Map[i].ArtWork.Content {
-			if art_index < frame {
-				e.Map[i].Snapshot = append(e.Map[i].Snapshot, line)
-			}
-		}
 	}
 }
 

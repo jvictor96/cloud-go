@@ -17,11 +17,12 @@ func main() {
 	}
 	galery.LoadArt()
 	engine := Engine{
-		Columns:  w, // Detectar via term.GetSize ou exec "tput cols"
-		Lines:    h,
-		Spacing:  2,
-		MaxLines: 100,
-		Galery:   galery,
+		Columns:     w, // Detectar via term.GetSize ou exec "tput cols"
+		Lines:       h,
+		Spacing:     2,
+		MaxLines:    100,
+		Galery:      galery,
+		Transformer: &Float{},
 	}
 
 	command := os.Args[1]
