@@ -1,10 +1,8 @@
-package main
+package core
 
 import (
 	"fmt"
-	"math/rand"
 	"strings"
-	"unicode/utf8"
 )
 
 type Engine struct {
@@ -12,6 +10,7 @@ type Engine struct {
 	Galery      Galery
 	Transformer Transformer
 	Sleeper     Sleeper
+	Placer      Placer
 	Map         []Placing
 	FinalBuffer []string
 	Columns     int
@@ -33,57 +32,19 @@ func (e *Engine) Route(input []string) {
 	e.Buffer = input
 	e.Map = []Placing{}
 
-	for e.PlaceImages() {
-	}
+	e.Placer.PlaceArt(e)
 	frame_count := e.Transformer.CalculateFrameCount(e)
 	e.ManipulateBuffer(0)
-	fmt.Print(strings.Join(e.FinalBuffer, "\n"))
+	fmt.Print(strings.Join(e.FinalBuffer, "\n") + "\n")
 	if !e.Dynamic {
 		return
 	}
 	for i := range frame_count {
 		e.Sleeper.Sleep(i)
-		fmt.Printf("\033[%dA", len(e.FinalBuffer)-1)
+		fmt.Printf("\033[%dA", len(e.FinalBuffer))
 		e.ManipulateBuffer(i)
-		fmt.Print(strings.Join(e.FinalBuffer, "\n"))
+		fmt.Print(strings.Join(e.FinalBuffer, "\n") + "\n")
 	}
-}
-
-func (e *Engine) PlaceImages() bool {
-	modified := false
-	for i := range e.Galery.ArtWorks {
-		art := &e.Galery.ArtWorks[i]
-		height := 0
-		pos := 0
-		minDif := 0
-		startingPoint := e.LastPrint + 1 + e.Spacing
-
-		for cursor, line := range e.Buffer {
-			lineLen := utf8.RuneCountInString(line)
-			if (e.Columns-lineLen > art.Width) && (cursor >= startingPoint) {
-				height++
-				if minDif < lineLen {
-					minDif = lineLen
-				}
-				if height > art.Height {
-					e.LastPrint = pos + art.Height + e.Spacing
-					fuzz := rand.Intn(e.Columns - minDif - art.Width - 1)
-					e.Map = append(e.Map, Placing{
-						ArtWork: art,
-						PosY:    pos,
-						Padding: minDif + fuzz,
-					})
-					modified = true
-					break
-				}
-			} else {
-				pos = cursor
-				minDif = lineLen
-				height = 0
-			}
-		}
-	}
-	return modified
 }
 
 func (e *Engine) ManipulateBuffer(frame int) {

@@ -1,10 +1,9 @@
-package main
+package ticker
 
-import "time"
-
-type Sleeper interface {
-	Sleep(i int)
-}
+import (
+	"math"
+	"time"
+)
 
 type Linear struct {
 	Speed int
@@ -20,5 +19,5 @@ type Accelerated struct {
 }
 
 func (a *Accelerated) Sleep(i int) {
-	time.Sleep(time.Duration(a.Speed+a.Acceleration*i) * time.Millisecond)
+	time.Sleep(time.Duration(math.Abs(float64(a.Speed+a.Acceleration*i))) * time.Millisecond)
 }

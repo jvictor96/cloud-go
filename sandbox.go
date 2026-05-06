@@ -2,6 +2,10 @@ package main
 
 import (
 	"bufio"
+	"cloud/art"
+	"cloud/core"
+	"cloud/ticker"
+	"cloud/transformer"
 	"fmt"
 	"os"
 	"strings"
@@ -12,7 +16,7 @@ import (
 func main() {
 	f, _ := os.Open("/dev/tty")
 	w, h, _ := term.GetSize(int(f.Fd()))
-	galery := Galery{
+	galery := core.Galery{
 		Path: fmt.Sprintf("%s/%s", os.Getenv("HOME"), ".cloud/art/"),
 	}
 	galery.LoadArt()
@@ -20,13 +24,14 @@ func main() {
 	if term.IsTerminal(int(os.Stdout.Fd())) {
 		dynamic = true
 	}
-	engine := Engine{
+	engine := core.Engine{
 		Columns:     w, // Detectar via term.GetSize ou exec "tput cols"
 		Lines:       h,
 		Dynamic:     dynamic,
 		Galery:      galery,
-		Transformer: &Float{},
-		Sleeper:     &Accelerated{Acceleration: 10},
+		Transformer: &transformer.Float{},
+		Placer:      &art.FillOnce{},
+		Sleeper:     &ticker.Accelerated{Speed: -30, Acceleration: 10},
 	}
 
 	var input []string
