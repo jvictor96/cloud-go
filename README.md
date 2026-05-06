@@ -26,5 +26,11 @@ cat large_file.txt | sandbox
 It comes without any ascii art load. Use the following command to load ascii arts
 
 ```bash
-sandbox add /path/to/your/art.txt
+sandbox add path/to/your/art.txt
+```
+
+E.g.
+
+```bash
+sandbox add samples/cloud
 ```
