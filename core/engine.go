@@ -39,11 +39,16 @@ func (e *Engine) Route(input []string) {
 	if !e.Dynamic {
 		return
 	}
-	for i := range frame_count {
-		e.Sleeper.Sleep(i)
-		fmt.Printf("\033[%dA", len(e.FinalBuffer))
-		e.ManipulateBuffer(i)
-		fmt.Print(strings.Join(e.FinalBuffer, "\n") + "\n")
+	e.Sleeper.SetDuration(frame_count)
+	for range 10 {
+		e.Map = []Placing{}
+		e.Placer.PlaceArt(e)
+		for i := range frame_count {
+			e.Sleeper.Sleep(i)
+			fmt.Printf("\033[%dA", len(e.FinalBuffer))
+			e.ManipulateBuffer(i)
+			fmt.Print(strings.Join(e.FinalBuffer, "\n") + "\n")
+		}
 	}
 }
 
@@ -75,16 +80,5 @@ func (e *Engine) ManipulateBuffer(frame int) {
 	for cursor < len(e.Buffer) {
 		e.FinalBuffer = append(e.FinalBuffer, e.Buffer[cursor])
 		cursor++
-	}
-}
-
-func (e *Engine) ManipulateArts3(frame int) {
-	for i := range e.Map {
-		e.Map[i].Snapshot = []string{}
-		for _, line := range e.Map[i].ArtWork.Content {
-			runes := []rune(line)
-			frame = frame % len(runes)
-			e.Map[i].Snapshot = append(e.Map[i].Snapshot, string(runes[frame:])+string(runes[:frame]))
-		}
 	}
 }

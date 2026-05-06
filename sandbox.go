@@ -31,7 +31,7 @@ func main() {
 		Galery:      galery,
 		Transformer: &transformer.Float{},
 		Placer:      &art.FillOnce{},
-		Sleeper:     &ticker.Accelerated{Speed: -30, Acceleration: 10},
+		Sleeper:     &ticker.Linear{Speed: 100},
 	}
 
 	var input []string

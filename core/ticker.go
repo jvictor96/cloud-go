@@ -1,5 +1,6 @@
 package core
 
 type Sleeper interface {
-	Sleep(i int)
+	Sleep(frame int)
+	SetDuration(t int)
 }
