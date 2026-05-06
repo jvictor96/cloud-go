@@ -40,7 +40,7 @@ func (e *Engine) Route(input []string) {
 		return
 	}
 	e.Sleeper.SetDuration(frame_count)
-	for range 10 {
+	for range 1 {
 		e.Map = []Placing{}
 		e.Placer.PlaceArt(e)
 		for i := range frame_count {
