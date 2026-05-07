@@ -8,7 +8,7 @@ import (
 type BarberShop struct {
 }
 
-func (f *BarberShop) CalculateFrameCount(e *core.Engine) int {
+func (f *BarberShop) CalculateFrameCount(e core.ArtWork) int {
 	return 5_000_000
 }
 

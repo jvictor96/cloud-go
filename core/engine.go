@@ -22,10 +22,11 @@ type Engine struct {
 }
 
 type Placing struct {
-	ArtWork  *ArtWork
-	Snapshot []string
-	PosY     int
-	Padding  int
+	ArtWork    *ArtWork
+	Snapshot   []string
+	PosY       int
+	Padding    int
+	FrameCount int
 }
 
 func (e *Engine) Route(input []string) {
@@ -33,16 +34,14 @@ func (e *Engine) Route(input []string) {
 	e.Map = []Placing{}
 
 	e.Placer.PlaceArt(e)
-	frame_count := e.Transformer.CalculateFrameCount(e)
 	e.ManipulateBuffer(0)
 	fmt.Print(strings.Join(e.FinalBuffer, "\n") + "\n")
 	if !e.Dynamic {
 		return
 	}
-	e.Sleeper.SetDuration(frame_count)
-	for range 1 {
+	for range 10 {
 		e.Map = []Placing{}
-		e.Placer.PlaceArt(e)
+		frame_count := e.Placer.PlaceArt(e)
 		for i := range frame_count {
 			e.Sleeper.Sleep(i)
 			fmt.Printf("\033[%dA", len(e.FinalBuffer))

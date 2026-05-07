@@ -12,9 +12,6 @@ func (l *Linear) Sleep(i int) {
 	time.Sleep(time.Duration(l.Speed) * time.Millisecond)
 }
 
-func (l *Linear) SetDuration(i int) {
-}
-
 type Accelerated struct {
 	MinSpeed float32
 	MaxSpeed float32
@@ -28,10 +25,6 @@ func (a *Accelerated) Sleep(frame int) {
 	time.Sleep(time.Duration(RawSpeed) * time.Millisecond)
 }
 
-func (a *Accelerated) SetDuration(d int) {
-	a.Duration = d
-}
-
 type InvertedAccelerated struct {
 	MinSpeed float32
 	MaxSpeed float32
@@ -43,8 +36,4 @@ func (a *InvertedAccelerated) Sleep(frame int) {
 	Speed := float32(a.Duration/2.0-frame) / float32(a.Duration/2.0)
 	RawSpeed := a.MaxSpeed + Diff*max(Speed, -Speed)
 	time.Sleep(time.Duration(RawSpeed) * time.Millisecond)
-}
-
-func (i *InvertedAccelerated) SetDuration(d int) {
-	i.Duration = d
 }

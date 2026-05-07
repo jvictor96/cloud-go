@@ -6,7 +6,7 @@ import (
 )
 
 type Placer interface {
-	PlaceArt(e *Engine)
+	PlaceArt(e *Engine) int
 }
 
 func PlaceImages(e *Engine) bool {

@@ -2,8 +2,8 @@ package main
 
 import (
 	"bufio"
-	"cloud/art"
 	"cloud/core"
+	"cloud/placer"
 	"cloud/ticker"
 	"cloud/transformer"
 	"fmt"
@@ -30,7 +30,7 @@ func main() {
 		Dynamic:     dynamic,
 		Galery:      galery,
 		Transformer: &transformer.Float{},
-		Placer:      &art.FillOnce{},
+		Placer:      &placer.FillOnce{},
 		Sleeper:     &ticker.Linear{Speed: 100},
 	}
 
