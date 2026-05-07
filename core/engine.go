@@ -6,18 +6,21 @@ import (
 )
 
 type Engine struct {
-	Buffer      []string
 	Galery      Galery
 	Transformer Transformer
 	Sleeper     Sleeper
 	Placer      Placer
+	Terminal    Terminal
 	Map         []Placing
-	FinalBuffer []string
+	Repetitions int
+}
+
+type Terminal struct {
 	Columns     int
 	Lines       int
+	Buffer      []string
+	FinalBuffer []string
 	Dynamic     bool
-	MaxLines    int
-	Spacing     int
 	LastPrint   int
 }
 
@@ -30,31 +33,43 @@ type Placing struct {
 }
 
 func (e *Engine) Route(input []string) {
-	e.Buffer = input
+	e.Terminal.Buffer = input
 	e.Map = []Placing{}
 
-	e.Placer.PlaceArt(e)
+	e.Galery.LoadArt()
+	e.PlaceArt()
 	e.ManipulateBuffer(0)
-	fmt.Print(strings.Join(e.FinalBuffer, "\n") + "\n")
-	if !e.Dynamic {
+	fmt.Print(strings.Join(e.Terminal.FinalBuffer, "\n") + "\n")
+	if !e.Terminal.Dynamic {
 		return
 	}
-	for range 10 {
+	for range e.Repetitions {
 		e.Map = []Placing{}
-		frame_count := e.Placer.PlaceArt(e)
+		frame_count := e.PlaceArt()
 		for i := range frame_count {
 			e.Sleeper.Sleep(i)
-			fmt.Printf("\033[%dA", len(e.FinalBuffer))
+			fmt.Printf("\033[%dA", len(e.Terminal.FinalBuffer))
 			e.ManipulateBuffer(i)
-			fmt.Print(strings.Join(e.FinalBuffer, "\n") + "\n")
+			fmt.Print(strings.Join(e.Terminal.FinalBuffer, "\n") + "\n")
 		}
 	}
 }
 
+func (e *Engine) PlaceArt() int {
+	e.Placer.PlaceArt(e)
+	max_frame_count := 0
+	for art := range e.Map {
+		frame_count := e.Transformer.CalculateFrameCount(*e.Map[art].ArtWork)
+		e.Map[art].FrameCount = frame_count
+		max_frame_count = max(frame_count, max_frame_count)
+	}
+	return max_frame_count
+}
+
 func (e *Engine) ManipulateBuffer(frame int) {
-	e.FinalBuffer = []string{}
+	e.Terminal.FinalBuffer = []string{}
 	cursor := 0
-	if e.Dynamic {
+	if e.Terminal.Dynamic {
 		e.Transformer.Transform(frame, e)
 	} else {
 		for art := range e.Map {
@@ -65,19 +80,19 @@ func (e *Engine) ManipulateBuffer(frame int) {
 	for _, art := range e.Map {
 
 		for cursor < art.PosY {
-			e.FinalBuffer = append(e.FinalBuffer, e.Buffer[cursor])
+			e.Terminal.FinalBuffer = append(e.Terminal.FinalBuffer, e.Terminal.Buffer[cursor])
 			cursor++
 		}
 
 		for cursor < (art.PosY + art.ArtWork.Height) {
-			line := fmt.Sprintf("%-*s%s", art.Padding, e.Buffer[cursor], art.Snapshot[cursor-art.PosY])
-			e.FinalBuffer = append(e.FinalBuffer, line)
+			line := fmt.Sprintf("%-*s%s", art.Padding, e.Terminal.Buffer[cursor], art.Snapshot[cursor-art.PosY])
+			e.Terminal.FinalBuffer = append(e.Terminal.FinalBuffer, line)
 			cursor++
 		}
 	}
 
-	for cursor < len(e.Buffer) {
-		e.FinalBuffer = append(e.FinalBuffer, e.Buffer[cursor])
+	for cursor < len(e.Terminal.Buffer) {
+		e.Terminal.FinalBuffer = append(e.Terminal.FinalBuffer, e.Terminal.Buffer[cursor])
 		cursor++
 	}
 }

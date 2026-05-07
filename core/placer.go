@@ -6,7 +6,8 @@ import (
 )
 
 type Placer interface {
-	PlaceArt(e *Engine) int
+	PlaceArt(e *Engine)
+	GetSpacing() int
 }
 
 func PlaceImages(e *Engine) bool {
@@ -16,18 +17,18 @@ func PlaceImages(e *Engine) bool {
 		height := 0
 		pos := 0
 		minDif := 0
-		startingPoint := e.LastPrint + 1 + e.Spacing
+		startingPoint := e.Terminal.LastPrint + 1 + e.Placer.GetSpacing()
 
-		for cursor, line := range e.Buffer {
+		for cursor, line := range e.Terminal.Buffer {
 			lineLen := utf8.RuneCountInString(line)
-			if (e.Columns-lineLen > art.Width) && (cursor >= startingPoint) {
+			if (e.Terminal.Columns-lineLen > art.Width) && (cursor >= startingPoint) {
 				height++
 				if minDif < lineLen {
 					minDif = lineLen
 				}
 				if height > art.Height {
-					e.LastPrint = pos + art.Height + e.Spacing
-					fuzz := rand.Intn(e.Columns - minDif - art.Width - 1)
+					e.Terminal.LastPrint = pos + art.Height + e.Placer.GetSpacing()
+					fuzz := rand.Intn(e.Terminal.Columns - minDif - art.Width - 1)
 					e.Map = append(e.Map, Placing{
 						ArtWork: art,
 						PosY:    pos,

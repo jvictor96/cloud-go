@@ -16,22 +16,17 @@ import (
 func main() {
 	f, _ := os.Open("/dev/tty")
 	w, h, _ := term.GetSize(int(f.Fd()))
-	galery := core.Galery{
-		Path: fmt.Sprintf("%s/%s", os.Getenv("HOME"), ".cloud/art/"),
-	}
-	galery.LoadArt()
 	dynamic := false
 	if term.IsTerminal(int(os.Stdout.Fd())) {
 		dynamic = true
 	}
 	engine := core.Engine{
-		Columns:     w, // Detectar via term.GetSize ou exec "tput cols"
-		Lines:       h,
-		Dynamic:     dynamic,
-		Galery:      galery,
+		Terminal:    core.Terminal{Columns: w, Lines: h, Dynamic: dynamic},
+		Galery:      core.Galery{Path: fmt.Sprintf("%s/%s", os.Getenv("HOME"), ".cloud/art/")},
 		Transformer: &transformer.Float{},
-		Placer:      &placer.FillOnce{},
+		Placer:      &placer.FillOnce{Spacing: 3},
 		Sleeper:     &ticker.Linear{Speed: 100},
+		Repetitions: 4,
 	}
 
 	var input []string
@@ -50,6 +45,6 @@ func main() {
 		engine.Route(input)
 	} else {
 		args := os.Args[1:]
-		galery.Route(args)
+		engine.Galery.Route(args)
 	}
 }
