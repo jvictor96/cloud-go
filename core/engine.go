@@ -27,13 +27,13 @@ type Placing struct {
 	Snapshot   []string
 	PosY       int
 	Padding    int
-	FrameCount int
+	FirstFrame int
 }
 
 func (e *Engine) Route(input []string) {
 	e.Terminal.Buffer = input
-
 	e.Galery.LoadArt()
+	e.Transformer.CalculateFrameCount(e.Galery.ArtWorks)
 	placing := e.Placer.PlaceArt(e.Galery.ArtWorks, e.Terminal)
 	final_buffer := e.ManipulateBuffer(0, placing)
 	fmt.Print(strings.Join(final_buffer, "\n") + "\n")
@@ -42,7 +42,7 @@ func (e *Engine) Route(input []string) {
 	}
 	for range e.Repetitions {
 		placing := e.Placer.PlaceArt(e.Galery.ArtWorks, e.Terminal)
-		frame_count := e.Transformer.CalculateFrameCount(placing)
+		frame_count := MaxFrameCount(placing)
 		for i := range frame_count {
 			e.Sleeper.Sleep(i)
 			final_buffer := e.ManipulateBuffer(i, placing)
@@ -50,6 +50,14 @@ func (e *Engine) Route(input []string) {
 			fmt.Print(strings.Join(final_buffer, "\n") + "\n")
 		}
 	}
+}
+
+func MaxFrameCount(placing []Placing) int {
+	fc := 0
+	for _, p := range placing {
+		fc = max(fc, p.FirstFrame+p.ArtWork.FrameCount)
+	}
+	return fc
 }
 
 func (e *Engine) ManipulateBuffer(frame int, mapa []Placing) []string {

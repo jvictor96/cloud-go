@@ -6,7 +6,7 @@ import (
 
 type Transformer interface {
 	Transform(frame int, art_work []Placing) []Placing
-	CalculateFrameCount(art_work []Placing) int
+	CalculateFrameCount(art_work []ArtWork) int
 }
 
 func FillAbove(buffer []string, width int, height int) []string {

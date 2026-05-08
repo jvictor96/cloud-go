@@ -8,10 +8,11 @@ import (
 )
 
 type ArtWork struct {
-	Width    int
-	Height   int
-	Filename string
-	Content  []string
+	Width      int
+	Height     int
+	Filename   string
+	Content    []string
+	FrameCount int
 }
 
 type Galery struct {
