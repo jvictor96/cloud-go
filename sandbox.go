@@ -24,7 +24,7 @@ func main() {
 		Terminal:    core.Terminal{Columns: w, Lines: h, Dynamic: dynamic},
 		Galery:      core.Galery{Path: fmt.Sprintf("%s/%s", os.Getenv("HOME"), ".cloud/art/")},
 		Transformer: &transformer.Float{},
-		Placer:      &placer.FillOnce{Spacing: 3},
+		Placer:      &placer.FillOnce{Spacing: 3, Chance: 0.5},
 		Sleeper:     &ticker.Linear{Speed: 100},
 		Repetitions: 4,
 	}

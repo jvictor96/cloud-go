@@ -7,22 +7,27 @@ import (
 type Float struct {
 }
 
-func (f *Float) CalculateFrameCount(a core.ArtWork) int {
-	return a.Height * 2
+func (f *Float) CalculateFrameCount(mapa []core.Placing) int {
+	fc := 0
+	for i := range mapa {
+		art_fc := mapa[i].ArtWork.Height * 2
+		mapa[i].FrameCount = art_fc
+		fc = max(art_fc, fc)
+	}
+	return fc
 }
 
-func (f *Float) Transform(frame int, e *core.Engine) {
-	for i := range e.Map {
-		if frame > e.Map[i].FrameCount {
+func (f *Float) Transform(frame int, mapa []core.Placing) []core.Placing {
+	for i := range mapa {
+		if frame > mapa[i].FrameCount {
+			mapa[i].Snapshot = core.FillAbove([]string{}, mapa[i].ArtWork.Width, mapa[i].ArtWork.Height)
 			continue
 		}
-		e.Map[i].Snapshot = []string{}
-		if frame < e.Map[i].ArtWork.Height {
-			e.Map[i].Snapshot = append(e.Map[i].Snapshot, e.Map[i].ArtWork.Content[:frame]...)
-			e.Map[i].Snapshot = core.FillAbove(e.Map[i].Snapshot, e.Map[i].ArtWork.Width, e.Map[i].ArtWork.Height)
+		if frame < mapa[i].ArtWork.Height {
+			mapa[i].Snapshot = core.FillAbove(mapa[i].ArtWork.Content[:frame], mapa[i].ArtWork.Width, mapa[i].ArtWork.Height)
 		} else {
-			e.Map[i].Snapshot = append(e.Map[i].Snapshot, e.Map[i].ArtWork.Content[frame-e.Map[i].ArtWork.Height:]...)
-			e.Map[i].Snapshot = core.FillBelow(e.Map[i].Snapshot, e.Map[i].ArtWork.Width, e.Map[i].ArtWork.Height)
+			mapa[i].Snapshot = core.FillBelow(mapa[i].ArtWork.Content[frame-mapa[i].ArtWork.Height:], mapa[i].ArtWork.Width, mapa[i].ArtWork.Height)
 		}
 	}
+	return mapa
 }
