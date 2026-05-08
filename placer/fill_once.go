@@ -15,6 +15,7 @@ func (placer *FillOnce) PlaceArt(artWorks []core.ArtWork, terminal core.Terminal
 	terminal.LastPrint = 0
 	mapa := []core.Placing{}
 	modified := true
+	rand.Shuffle(len(artWorks), func(i, j int) { artWorks[i], artWorks[j] = artWorks[j], artWorks[i] })
 	for modified {
 		modified = false
 		for i := range artWorks {
@@ -27,6 +28,9 @@ func (placer *FillOnce) PlaceArt(artWorks []core.ArtWork, terminal core.Terminal
 			for cursor, line := range terminal.Buffer {
 				lineLen := utf8.RuneCountInString(line)
 				if (terminal.Columns-lineLen > art.Width) && (cursor >= startingPoint) {
+					if rand.Float32() > placer.Chance && height == 0 {
+						continue
+					}
 					height++
 					if minDif < lineLen {
 						minDif = lineLen
