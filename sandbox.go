@@ -23,10 +23,10 @@ func main() {
 	engine := core.Engine{
 		Terminal:    core.Terminal{Columns: w, Dynamic: dynamic},
 		Galery:      core.Galery{Path: fmt.Sprintf("%s/%s", os.Getenv("HOME"), ".cloud/art/")},
-		Transformer: &transformer.Float{},
+		Transformer: &transformer.KeepFloat{},
 		Placer:      &placer.DoFill{FillOnce: placer.FillOnce{Spacing: 3, Chance: 0.25}},
 		//Placer:      &placer.FillOnce{Spacing: 2, Chance: 0.25},
-		Sleeper:     &ticker.Linear{Speed: 100},
+		Sleeper:     &ticker.Linear{Speed: 400},
 		Repetitions: 3,
 	}
 

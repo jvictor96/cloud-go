@@ -8,7 +8,14 @@ import (
 type BarberShop struct {
 }
 
-func (f *BarberShop) CalculateFrameCount(mapa []core.Placing) int {
+func (f *BarberShop) Resize(art []core.ArtWork) []core.ArtWork {
+	return art
+}
+
+func (f *BarberShop) CalculateFrameCount(mapa []core.ArtWork) int {
+	for i := range mapa {
+		mapa[i].FrameCount = 5_000_000
+	}
 	return 5_000_000
 }
 

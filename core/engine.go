@@ -32,13 +32,16 @@ type Placing struct {
 func (e *Engine) Route(input []string) {
 	e.Terminal.Buffer = input
 	e.Galery.LoadArt()
+	e.Galery.ArtWorks = e.Transformer.Resize(e.Galery.ArtWorks)
 	e.Transformer.CalculateFrameCount(e.Galery.ArtWorks)
-	placing := e.Placer.PlaceArt(e.Galery.ArtWorks, e.Terminal)
-	final_buffer := ManipulateBuffer(0, placing, e.Transformer, e.Terminal)
-	fmt.Print(strings.Join(final_buffer, "\n") + "\n")
 	if !e.Terminal.Dynamic {
+		placing := e.Placer.PlaceArt(e.Galery.ArtWorks, e.Terminal)
+		final_buffer := ManipulateBuffer(0, placing, e.Transformer, e.Terminal)
+		fmt.Print(strings.Join(final_buffer, "\n") + "\n")
 		return
 	}
+	final_buffer := ManipulateBuffer(0, []Placing{}, e.Transformer, e.Terminal)
+	fmt.Print(strings.Join(final_buffer, "\n") + "\n")
 	for range e.Repetitions {
 		placing := e.Placer.PlaceArt(e.Galery.ArtWorks, e.Terminal)
 		frame_count := MaxFrameCount(placing)

@@ -7,6 +7,10 @@ import (
 type Float struct {
 }
 
+func (f *Float) Resize(arts []core.ArtWork) []core.ArtWork {
+	return arts
+}
+
 func (f *Float) CalculateFrameCount(mapa []core.ArtWork) int {
 	fc := 0
 	for i := range mapa {
