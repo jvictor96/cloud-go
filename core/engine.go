@@ -16,7 +16,6 @@ type Engine struct {
 
 type Terminal struct {
 	Columns   int
-	Lines     int
 	Buffer    []string
 	Dynamic   bool
 	LastPrint int
@@ -35,7 +34,7 @@ func (e *Engine) Route(input []string) {
 	e.Galery.LoadArt()
 	e.Transformer.CalculateFrameCount(e.Galery.ArtWorks)
 	placing := e.Placer.PlaceArt(e.Galery.ArtWorks, e.Terminal)
-	final_buffer := e.ManipulateBuffer(0, placing)
+	final_buffer := ManipulateBuffer(0, placing, e.Transformer, e.Terminal)
 	fmt.Print(strings.Join(final_buffer, "\n") + "\n")
 	if !e.Terminal.Dynamic {
 		return
@@ -45,7 +44,7 @@ func (e *Engine) Route(input []string) {
 		frame_count := MaxFrameCount(placing)
 		for i := range frame_count {
 			e.Sleeper.Sleep(i)
-			final_buffer := e.ManipulateBuffer(i, placing)
+			final_buffer := ManipulateBuffer(i, placing, e.Transformer, e.Terminal)
 			fmt.Printf("\033[%dA", len(final_buffer))
 			fmt.Print(strings.Join(final_buffer, "\n") + "\n")
 		}
@@ -60,36 +59,47 @@ func MaxFrameCount(placing []Placing) int {
 	return fc
 }
 
-func (e *Engine) ManipulateBuffer(frame int, mapa []Placing) []string {
+func ManipulateBuffer(frame int, mapa []Placing, transformer Transformer, terminal Terminal) []string {
 	cursor := 0
 	final_buffer := []string{}
-	if e.Terminal.Dynamic {
+	if terminal.Dynamic {
 		for i := range mapa {
 			mapa[i].Snapshot = []string{}
 		}
-		e.Transformer.Transform(frame, mapa)
+		transformer.Transform(frame, mapa)
 	} else {
 		for art := range mapa {
 			mapa[art].Snapshot = mapa[art].ArtWork.Content
 		}
 	}
 
-	for _, art := range mapa {
+	for index, art := range mapa {
 
 		for cursor < art.PosY {
-			final_buffer = append(final_buffer, e.Terminal.Buffer[cursor])
+			final_buffer = append(final_buffer, terminal.Buffer[cursor])
 			cursor++
 		}
 
 		for cursor < (art.PosY + art.ArtWork.Height) {
-			line := fmt.Sprintf("%-*s%s", art.Padding, e.Terminal.Buffer[cursor], art.Snapshot[cursor-art.PosY])
+			buffer := terminal.Buffer[cursor]
+			artLine := art.Snapshot[cursor-art.PosY]
+			line := fmt.Sprintf("%-*s%s", art.Padding, buffer, artLine)
 			final_buffer = append(final_buffer, line)
 			cursor++
 		}
+		if index+1 < len(mapa) && mapa[index+1].PosY < cursor {
+			for cursor < len(terminal.Buffer) {
+				final_buffer = append(final_buffer, terminal.Buffer[cursor])
+				cursor++
+			}
+			cursor = 0
+			terminal.Buffer = final_buffer
+			final_buffer = []string{}
+		}
 	}
 
-	for cursor < len(e.Terminal.Buffer) {
-		final_buffer = append(final_buffer, e.Terminal.Buffer[cursor])
+	for cursor < len(terminal.Buffer) {
+		final_buffer = append(final_buffer, terminal.Buffer[cursor])
 		cursor++
 	}
 	return final_buffer

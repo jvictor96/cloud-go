@@ -15,18 +15,19 @@ import (
 
 func main() {
 	f, _ := os.Open("/dev/tty")
-	w, h, _ := term.GetSize(int(f.Fd()))
+	w, _, _ := term.GetSize(int(f.Fd()))
 	dynamic := false
 	if term.IsTerminal(int(os.Stdout.Fd())) {
 		dynamic = true
 	}
 	engine := core.Engine{
-		Terminal:    core.Terminal{Columns: w, Lines: h, Dynamic: dynamic},
+		Terminal:    core.Terminal{Columns: w, Dynamic: dynamic},
 		Galery:      core.Galery{Path: fmt.Sprintf("%s/%s", os.Getenv("HOME"), ".cloud/art/")},
 		Transformer: &transformer.Float{},
-		Placer:      &placer.FillUnsync{FillOnce: placer.FillOnce{Spacing: 3, Chance: 0.25}},
+		Placer:      &placer.DoFill{FillOnce: placer.FillOnce{Spacing: 3, Chance: 0.25}},
+		//Placer:      &placer.FillOnce{Spacing: 2, Chance: 0.25},
 		Sleeper:     &ticker.Linear{Speed: 100},
-		Repetitions: 4,
+		Repetitions: 3,
 	}
 
 	var input []string
