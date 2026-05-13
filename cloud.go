@@ -20,7 +20,7 @@ func main() {
 	transformer_impl = &transformer.Static{}
 	reps := 1
 	if term.IsTerminal(int(os.Stdout.Fd())) {
-		transformer_impl = &transformer.KeepFloat{}
+		transformer_impl = &transformer.KeepFloat{Amplitude: 5}
 		reps = 3
 	}
 	engine := core.Engine{
