@@ -17,7 +17,6 @@ type Engine struct {
 type Terminal struct {
 	Columns   int
 	Buffer    []string
-	Dynamic   bool
 	LastPrint int
 }
 
@@ -34,22 +33,14 @@ func (e *Engine) Route(input []string) {
 	e.Galery.LoadArt()
 	e.Galery.ArtWorks = e.Transformer.Resize(e.Galery.ArtWorks)
 	e.Transformer.CalculateFrameCount(e.Galery.ArtWorks)
-	if !e.Terminal.Dynamic {
-		placing := e.Placer.PlaceArt(e.Galery.ArtWorks, e.Terminal)
-		final_buffer := ManipulateBuffer(0, placing, e.Transformer, e.Terminal)
-		fmt.Print(strings.Join(final_buffer, "\n") + "\n")
-		return
-	}
-	final_buffer := ManipulateBuffer(0, []Placing{}, e.Transformer, e.Terminal)
-	fmt.Print(strings.Join(final_buffer, "\n") + "\n")
 	for range e.Repetitions {
 		placing := e.Placer.PlaceArt(e.Galery.ArtWorks, e.Terminal)
 		frame_count := MaxFrameCount(placing)
 		for i := range frame_count {
 			e.Sleeper.Sleep(i)
 			final_buffer := ManipulateBuffer(i, placing, e.Transformer, e.Terminal)
-			fmt.Printf("\033[%dA", len(final_buffer))
 			fmt.Print(strings.Join(final_buffer, "\n") + "\n")
+			fmt.Printf("\033[%dA", len(final_buffer))
 		}
 	}
 }
@@ -65,16 +56,7 @@ func MaxFrameCount(placing []Placing) int {
 func ManipulateBuffer(frame int, mapa []Placing, transformer Transformer, terminal Terminal) []string {
 	cursor := 0
 	final_buffer := []string{}
-	if terminal.Dynamic {
-		for i := range mapa {
-			mapa[i].Snapshot = []string{}
-		}
-		transformer.Transform(frame, mapa)
-	} else {
-		for art := range mapa {
-			mapa[art].Snapshot = mapa[art].ArtWork.Content
-		}
-	}
+	transformer.Transform(frame, mapa)
 
 	for index, art := range mapa {
 
