@@ -21,11 +21,12 @@ type Terminal struct {
 }
 
 type Placing struct {
-	ArtWork    *ArtWork
-	Snapshot   []string
-	PosY       int
-	Padding    int
-	FirstFrame int
+	ArtWork     *ArtWork
+	Snapshot    []string
+	AlphaFilter []string
+	PosY        int
+	Padding     int
+	FirstFrame  int
 }
 
 func (e *Engine) Route(input []string) {
@@ -66,10 +67,20 @@ func ManipulateBuffer(frame int, mapa []Placing, transformer Transformer, termin
 		}
 
 		for cursor < (art.PosY + art.ArtWork.Height) {
-			buffer := terminal.Buffer[cursor]
-			artLine := art.Snapshot[cursor-art.PosY]
-			line := fmt.Sprintf("%-*s%s", art.Padding, buffer, artLine)
-			final_buffer = append(final_buffer, line)
+			buffer := []rune(terminal.Buffer[cursor])
+			artLine := []rune(strings.Repeat("f", art.Padding) + art.Snapshot[cursor-art.PosY])
+			l := max(len(artLine), len(buffer))
+			var line strings.Builder
+			for i := range l {
+				if i < len(artLine) && artLine[i] != 'f' {
+					line.WriteRune(artLine[i])
+				} else if i < len(buffer) {
+					line.WriteRune(buffer[i])
+				} else {
+					line.WriteByte(' ')
+				}
+			}
+			final_buffer = append(final_buffer, line.String())
 			cursor++
 		}
 		if index+1 < len(mapa) && mapa[index+1].PosY < cursor {
