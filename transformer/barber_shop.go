@@ -12,11 +12,10 @@ func (f *BarberShop) Resize(art []core.ArtWork) []core.ArtWork {
 	return art
 }
 
-func (f *BarberShop) CalculateFrameCount(mapa []core.ArtWork) int {
+func (f *BarberShop) CalculateFrameCount(mapa []core.ArtWork) {
 	for i := range mapa {
 		mapa[i].FrameCount = 5_000_000
 	}
-	return 5_000_000
 }
 
 func (f *BarberShop) Transform(frame int, mapa []core.Placing) []core.Placing {

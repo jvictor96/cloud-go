@@ -14,7 +14,7 @@ type Sleeper interface {
 
 type Transformer interface {
 	Transform(frame int, art_works []Placing) []Placing
-	CalculateFrameCount(art_work []ArtWork) int
+	CalculateFrameCount(art_work []ArtWork)
 	Resize(art []ArtWork) []ArtWork
 }
 

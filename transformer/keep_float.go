@@ -16,11 +16,10 @@ func (f *KeepFloat) Resize(arts []core.ArtWork) []core.ArtWork {
 	return arts
 }
 
-func (f *KeepFloat) CalculateFrameCount(mapa []core.ArtWork) int {
+func (f *KeepFloat) CalculateFrameCount(mapa []core.ArtWork) {
 	for i := range mapa {
 		mapa[i].FrameCount = 5_000_000
 	}
-	return 5_000_000
 }
 
 func (f *KeepFloat) Transform(frame int, mapa []core.Placing) []core.Placing {
